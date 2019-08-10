@@ -210,11 +210,13 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.playWord = function() {
     var word = _.pluck(self.submitted, 'letter').join('');
     var config = { params: { 'word': word } };
-    $http.get('/word', config).
-      then(function(response) {
-        if (response.data.length === 0) { return self.notAWord(word); }
-        return self.isAWord(word, response.data[0].text);
-      });
+    
+    $http.get('/word', config).then(function(response) {
+      if (response.data.length === 0) {
+        return self.notAWord(word);
+      }
+      return self.isAWord(word, response.data.description);
+    });
   };
 
   self.notAWord = function(word) {
