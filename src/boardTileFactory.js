@@ -4,6 +4,28 @@ app.factory('boardTileFactory', function() {
     this.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
     this.vertical = false;
     this.horizontal = false;
+    this.boardMap = {
+      "A": {},
+      "B": {},
+      "C": {},
+      "D": {},
+      "E": {},
+      "F": {},
+      "G": {},
+      "H": {},
+      "I": {},
+      "J": {},
+      "K": {},
+      "L": {},
+      "M": {},
+      "N": {},
+      "O": {},
+    };
+  };
+
+  BoardTile.prototype.setBoardMap = function(letter) {
+    var index = letter.position.charAt(0);
+    this.boardMap[index][letter.position] = letter;
   };
 
   BoardTile.prototype.hasDirection = function() {
