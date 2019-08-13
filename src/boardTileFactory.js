@@ -2,8 +2,15 @@ app.factory('boardTileFactory', function() {
 
   var BoardTile = function() {
     this.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
+    this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     this.vertical = false;
     this.horizontal = false;
+    this.boardRoad = {
+      'north': [],
+      'south': [],
+      'west': [],
+      'east': [],
+    };
     this.boardMap = {
       "A": {},
       "B": {},
@@ -45,9 +52,65 @@ app.factory('boardTileFactory', function() {
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
   };
 
+  BoardTile.prototype.mapRoadBlockDirections = function(placedTile) {
+    var placedTileCoords = {};
+    placedTileCoords.latitude = placedTile.charAt(0);
+    placedTileCoords.latitudeIndex = this.alphabet.indexOf(placedTileCoords.latitude);
+    placedTileCoords.longitude = placedTile.charAt(1);
+    placedTileCoords.address = placedTile;
+
+    var directions = ['north', 'south', 'west', 'east'];
+
+    for (var i in directions) {
+      this.checkRoadBlock(placedTileCoords, directions[i]);
+    }
+  };
+
+  BoardTile.prototype.checkRoadBlock = function(placedTileCoords, direction) {
+    var checkTileCoords = {};
+
+    switch (direction) {
+      case 'north':
+      case 'south':
+        if (direction === 'north') {
+          checkTileCoords.latitudeIndex = Number(placedTileCoords.latitudeIndex) - 1;
+        } else {
+          checkTileCoords.latitudeIndex = Number(placedTileCoords.latitudeIndex) + 1;
+        }
+        checkTileCoords.latitude = this.alphabet.charAt(checkTileCoords.latitudeIndex);
+        checkTileCoords.longitude = placedTileCoords.longitude;
+        checkTileCoords.address = checkTileCoords.latitude + checkTileCoords.longitude;
+        break;
+      case 'west':
+      case 'east':
+        checkTileCoords.latitudeIndex = placedTileCoords.latitudeIndex;
+        checkTileCoords.latitude = placedTileCoords.latitude;
+        if (direction === 'west') {
+          checkTileCoords.longitude = Number(placedTileCoords.longitude) - 1;
+        } else {
+          checkTileCoords.longitude = Number(placedTileCoords.longitude) + 1;
+        }
+        checkTileCoords.address = checkTileCoords.latitude + checkTileCoords.longitude;
+        break;
+    }
+
+    if (checkTileCoords.length !== 0 && this.boardMap[checkTileCoords.latitude][checkTileCoords.address] !== undefined) {
+      this.boardRoad[direction][checkTileCoords.address] = this.boardMap[checkTileCoords.latitude][checkTileCoords.address];
+      return true;
+    }
+
+    return false;
+  };
+
   BoardTile.prototype.resetDirection = function() {
     this.vertical = false;
     this.horizontal = false;
+    this.boardRoad = {
+      'north': [],
+      'south': [],
+      'west': [],
+      'east': [],
+    };
   };
 
   BoardTile.prototype.setTile = function(x, y, board) {
@@ -88,7 +151,9 @@ app.factory('boardTileFactory', function() {
   };
 
   BoardTile.prototype.determineDirection = function(playerInput) {
-    if (playerInput.length === 1) { return; }
+    if (playerInput.length === 1) {
+      return;
+    }
     var placedTile = this.reverseConvert(playerInput[0].position);
     var tileToCheck = this.reverseConvert(playerInput[1].position);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) {
