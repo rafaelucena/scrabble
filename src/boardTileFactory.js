@@ -199,31 +199,23 @@ app.factory('boardTileFactory', function() {
   };
 
   BoardTile.prototype.isOnAnySide = function(tileToCheck, placedTile) {
-    return this.isAboveOrBelow(tileToCheck, placedTile) || this.isEitherSide(tileToCheck, placedTile);
+    return this.isSameTileColumn(tileToCheck, placedTile) || this.isSameTileRow(tileToCheck, placedTile);
   };
 
   BoardTile.prototype.isEitherSide = function(tileToCheck, placedTile) {
-    return this.isOneTileToLeft(tileToCheck, placedTile) || this.isOneTileToRight(tileToCheck, placedTile);
+    return this.isSameTileRow(tileToCheck, placedTile);
   };
 
   BoardTile.prototype.isAboveOrBelow = function(tileToCheck, placedTile) {
-    return this.isOneTileAbove(tileToCheck, placedTile) || this.isOneTileBelow(tileToCheck, placedTile);
+    return this.isSameTileColumn(tileToCheck, placedTile);
   };
 
-  BoardTile.prototype.isOneTileAbove = function(tileToCheck, placedTile) {
-    return placedTile[0] - 1 === tileToCheck[0] && placedTile[1] === tileToCheck[1];
+  BoardTile.prototype.isSameTileColumn = function(tileToCheck, placedTile) {
+    return placedTile[0] === tileToCheck[0];
   };
 
-  BoardTile.prototype.isOneTileBelow = function(tileToCheck, placedTile) {
-    return placedTile[0] + 1 === tileToCheck[0] && placedTile[1] === tileToCheck[1];
-  };
-
-  BoardTile.prototype.isOneTileToLeft = function(tileToCheck, placedTile) {
-    return placedTile[0] === tileToCheck[0] && placedTile[1] - 1 === tileToCheck[1];
-  };
-
-  BoardTile.prototype.isOneTileToRight = function(tileToCheck, placedTile) {
-    return placedTile[0] === tileToCheck[0] && placedTile[1] + 1 === tileToCheck[1];
+  BoardTile.prototype.isSameTileRow = function(tileToCheck, placedTile) {
+    return placedTile[1] === tileToCheck[1];
   };
 
   return BoardTile;
