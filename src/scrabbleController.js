@@ -48,8 +48,10 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.disablePlayWord = function() {
-    if (self.input.length === 0) { return true; }
-    if (self.gameRules === true && self.intersecting === false && self.wordHistory.length !== 0) {
+    if (self.input.length === 0) { 
+      return true; 
+    }
+    if (self.gameRules === true && self.wordHistory.length !== 0) {
       return true;
     }
     return false;
@@ -131,43 +133,30 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
 
   self.selectTile = function(x, y) {
     var tile = boardTileService.convert(x, y);
-    if (self.canPlace(x, y, tile) === false) { return; }
+    if (self.canPlace(x, y, tile) === false) {
+      return;
+    }
     self.addPlacedClass();
     self.addTile(tile);
     self.checkForCompoundWord();
   };
 
   self.addTile = function(tile) {
-    if (self.selected === 'blank') { return self.assignLetterToBlank(tile); }
+    if (self.selected === 'blank') {
+      return self.assignLetterToBlank(tile);
+    }
     self.addToInput(tile, false);
   };
 
   self.checkForCompoundWord = function() {
-    for (var i in self.letterHistory) {
-      for (var j in self.submitted) {
-        var tileToCheck = self.letterHistory[i].position;
-        var placedTile = self.submitted[j].position;
-        var isValidtile = boardTileService.checkNextTile(tileToCheck, placedTile);
-        var tileAlreadyAdded = self.tileAlreadyAdded(tileToCheck);
-        if (isValidtile === true && tileAlreadyAdded === false) {
-          self.intersecting = true;
-          self.addToCompoundWord(self.letterHistory[i]);
-        }
-      }
+    for (var i in self.submitted) {
+      var placedTile = self.submitted[i].position;
+      boardTileService.mapRoadBlockDirections(placedTile);
     }
-    self.organiseSubmission();
   };
 
   self.tileAlreadyAdded = function(tileToCheck) {
     return _.contains(_.pluck(self.submitted, 'position'), tileToCheck);
-  };
-
-  self.addToCompoundWord = function(letter) {
-    self.submitted.push(letter);
-    if (boardTileService.hasDirection() === false) {
-      boardTileService.determineDirection(self.submitted);
-    }
-    self.checkForCompoundWord();
   };
 
   self.assignLetterToBlank = function(tile) {
@@ -183,9 +172,14 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.addToInput = function(tile, isBlank) {
+    let userInput = {
+      'letter': self.selected,
+      'position': tile,
+      'blank': isBlank
+    };
     self.boardDisplay[tile] = self.selected;
-    self.submitted.push({ 'letter': self.selected, 'position': tile, 'blank': isBlank });
-    self.input.push({ 'letter': self.selected, 'position': tile, 'blank': isBlank });
+    self.submitted.push(userInput);
+    self.input.push(userInput);
     self.organiseSubmission();
     self.selected = null;
   };
@@ -235,6 +229,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
 
   self.updateLetterHistory = function() {
     _.each(self.input, function(letter) {
+      boardTileService.setBoardMap(letter);
       self.letterHistory.push(letter);
     });
   };
@@ -269,7 +264,5 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.resetInput = function() {
     self.input = [];
     self.submitted = [];
-    self.intersecting = false;
   };
-
 }]);
