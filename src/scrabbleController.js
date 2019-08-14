@@ -1,4 +1,4 @@
-app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'boardTileFactory', 'ngDialog', function($http, wordsFactory, gameFactory, boardTileFactory, ngDialog) {
+app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'boardTileFactory', 'ngDialog', function ($http, wordsFactory, gameFactory, boardTileFactory, ngDialog) {
 
   var self = this;
 
@@ -13,25 +13,25 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   var gameService = new gameFactory();
   var wordService = new wordsFactory();
 
-          // Game setup
+  // Game setup
 
-  self.showGameRulesButton = function() {
+  self.showGameRulesButton = function () {
     $http.get('/config').
-      then(function(response) {
+      then(function (response) {
         self.gameRules = (response.data.env === 'production');
       });
   };
 
-  self.toggleGameRules =  function() {
+  self.toggleGameRules = function () {
     self.gameRules = !self.gameRules;
   };
 
-  self.gameRulesButton = function() {
+  self.gameRulesButton = function () {
     if (self.gameRules === true) { return 'On'; }
     return 'Off';
   };
 
-  self.setup = function() {
+  self.setup = function () {
     self.bag = gameService.createBag();
     self.bonuses = gameService.createBoard();
     self.boardDisplay = _.clone(self.bonuses);
@@ -39,7 +39,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.resetInput();
   };
 
-  self.distributeNewLetters = function() {
+  self.distributeNewLetters = function () {
     if (self.bag.length < (7 - self.player1Letters.length)) {
       console.log('Game Over!');
       return;
@@ -47,9 +47,9 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.player1Letters = gameService.distributeLetters(self.player1Letters, self.bag);
   };
 
-  self.disablePlayWord = function() {
-    if (self.input.length === 0) { 
-      return true; 
+  self.disablePlayWord = function () {
+    if (self.input.length === 0) {
+      return true;
     }
     if (self.gameRules === true && self.wordHistory.length !== 0) {
       return true;
@@ -57,45 +57,45 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     return false;
   };
 
-  self.shuffleLetters = function() {
+  self.shuffleLetters = function () {
     self.player1Letters = _.shuffle(self.player1Letters);
   };
 
-          // Rendering correct tiles
+  // Rendering correct tiles
 
-  self.tile = function(x, y) {
+  self.tile = function (x, y) {
     return boardTileService.setTile(x, y, self.boardDisplay);
   };
 
-          // Displaying player letters at correct opacity
+  // Displaying player letters at correct opacity
 
-  self.showSelected = function(index) {
+  self.showSelected = function (index) {
     return self.player1Letters[index].status;
   };
 
-  self.alreadyPlaced = function(index) {
+  self.alreadyPlaced = function (index) {
     return self.player1Letters[index] === 'placed';
   };
 
-  self.removeAllSelectedClass = function() {
+  self.removeAllSelectedClass = function () {
     self.player1Letters = wordService.removeAllSelectedClass(self.player1Letters);
   };
 
-  self.removeAllPlacedClasses = function() {
+  self.removeAllPlacedClasses = function () {
     self.player1Letters = wordService.removeAllPlacedClasses(self.player1Letters);
   };
 
-  self.addSelectedClass = function(index) {
+  self.addSelectedClass = function (index) {
     self.player1Letters = wordService.addSelectedClass(self.player1Letters, index);
   };
 
-  self.addPlacedClass = function() {
+  self.addPlacedClass = function () {
     self.player1Letters = wordService.addPlacedClass(self.player1Letters);
   };
 
-          // Display board tiles at correct opacity
+  // Display board tiles at correct opacity
 
-  self.showBoardTiles = function(x, y) {
+  self.showBoardTiles = function (x, y) {
     if (self.wordHistory.length === 0 && self.input.length === 0 && self.gameRules === true) {
       return boardTileService.showStartingTile(x, y);
     }
@@ -110,13 +110,13 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     return boardTileService.showBoardTiles(tileToCheck, self.submitted);
   };
 
-  self.disabledTile = function(x, y) {
+  self.disabledTile = function (x, y) {
     return self.showBoardTiles(x, y) === 'board-tiles-inactive';
   };
 
-          // Placing tiles on the board
+  // Placing tiles on the board
 
-  self.selectLetter = function(index) {
+  self.selectLetter = function (index) {
     if (self.player1Letters[index].status === 'placed') { return; }
     if (self.player1Letters[index].status === 'selected') {
       return self.undoSelect(index);
@@ -126,12 +126,12 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.addSelectedClass(index);
   };
 
-  self.undoSelect = function(index) {
+  self.undoSelect = function (index) {
     self.selected = null;
     self.removeAllSelectedClass();
   };
 
-  self.selectTile = function(x, y) {
+  self.selectTile = function (x, y) {
     var tile = boardTileService.convert(x, y);
     if (self.canPlace(x, y, tile) === false) {
       return;
@@ -141,37 +141,38 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.checkForCompoundWord();
   };
 
-  self.addTile = function(tile) {
+  self.addTile = function (tile) {
     if (self.selected === 'blank') {
       return self.assignLetterToBlank(tile);
     }
     self.addToInput(tile, false);
   };
 
-  self.checkForCompoundWord = function() {
+  self.checkForCompoundWord = function () {
     for (var i in self.submitted) {
       var placedTile = self.submitted[i].position;
       boardTileService.mapRoadBlockDirections(placedTile);
     }
   };
 
-  self.tileAlreadyAdded = function(tileToCheck) {
+  self.tileAlreadyAdded = function (tileToCheck) {
     return _.contains(_.pluck(self.submitted, 'position'), tileToCheck);
   };
 
-  self.assignLetterToBlank = function(tile) {
-    ngDialog.openConfirm({ template: 'popupForm',
-                          controller: 'ScrabbleController',
-                          controllerAs:'scrbCtrl'
-                        }).then(function(letter) {
-                          if (/[a-z]/i.test(letter) === true && letter !== undefined) {
-                            self.selected = letter.toLowerCase();
-                            self.addToInput(tile, true);
-                          }
-                        });
+  self.assignLetterToBlank = function (tile) {
+    ngDialog.openConfirm({
+      template: 'popupForm',
+      controller: 'ScrabbleController',
+      controllerAs: 'scrbCtrl'
+    }).then(function (letter) {
+      if (/[a-z]/i.test(letter) === true && letter !== undefined) {
+        self.selected = letter.toLowerCase();
+        self.addToInput(tile, true);
+      }
+    });
   };
 
-  self.addToInput = function(tile, isBlank) {
+  self.addToInput = function (tile, isBlank) {
     let userInput = {
       'letter': self.selected,
       'position': tile,
@@ -184,28 +185,28 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.selected = null;
   };
 
-  self.canPlace = function(x, y, tile) {
+  self.canPlace = function (x, y, tile) {
     if (self.disabledTile(x, y) === true || self.selected === null) { return false; }
     if (self.boardDisplay[tile] === undefined) { return true; }
     if (self.boardDisplay[tile].length === 1) { return false; }
   };
 
-  self.organiseSubmission = function() {
+  self.organiseSubmission = function () {
     self.submitted = wordService.organiseSubmission(self.submitted);
   };
 
-  self.swapLetter = function() {
+  self.swapLetter = function () {
     self.player1Letters = gameService.swapLetter(self.player1Letters, self.bag);
     self.selected = null;
   };
 
-          // Playing the word
+  // Playing the word
 
-  self.playWord = function() {
+  self.playWord = function () {
     var word = _.pluck(self.submitted, 'letter').join('');
     var config = { params: { 'word': word } };
-    
-    $http.get('/word', config).then(function(response) {
+
+    $http.get('/word', config).then(function (response) {
       if (response.data.length === 0) {
         return self.notAWord(word);
       }
@@ -213,12 +214,12 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     });
   };
 
-  self.notAWord = function(word) {
+  self.notAWord = function (word) {
     self.wordHistory.push({ 'word': word, 'points': 0, 'definition': 'Not a word!' });
     self.resetRound();
   };
 
-  self.isAWord = function(word, definition) {
+  self.isAWord = function (word, definition) {
     self.getPoints(word, definition);
     self.player1Letters = wordService.removePlacedLetters(self.player1Letters);
     self.distributeNewLetters();
@@ -227,41 +228,41 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     boardTileService.resetDirection();
   };
 
-  self.updateLetterHistory = function() {
-    _.each(self.input, function(letter) {
+  self.updateLetterHistory = function () {
+    _.each(self.input, function (letter) {
       boardTileService.setBoardMap(letter);
       self.letterHistory.push(letter);
     });
   };
 
-  self.getPoints = function(word, definition) {
+  self.getPoints = function (word, definition) {
     var points = gameService.getPoints(self.submitted);
-    self.wordHistory.push( { 'word': word, 'points': points, 'definition': definition } );
+    self.wordHistory.push({ 'word': word, 'points': points, 'definition': definition });
     self.totalScore += points;
   };
 
-          // Clearing
+  // Clearing
 
-  self.resetRound = function() {
+  self.resetRound = function () {
     self.removeTileFromDisplay();
     self.resetInput();
     self.removeAllPlacedClasses();
   };
 
-   self.removeTileFromDisplay = function() {
-    _.each(_.pluck(self.input, 'position'), function(position) {
+  self.removeTileFromDisplay = function () {
+    _.each(_.pluck(self.input, 'position'), function (position) {
       self.boardDisplay[position] = self.bonuses[position];
     });
     boardTileService.resetDirection();
   };
 
-  self.clear = function() {
+  self.clear = function () {
     self.removeTileFromDisplay();
     self.removeAllPlacedClasses();
     self.resetInput();
   };
 
-  self.resetInput = function() {
+  self.resetInput = function () {
     self.input = [];
     self.submitted = [];
   };
