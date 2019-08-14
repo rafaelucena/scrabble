@@ -1,6 +1,6 @@
-app.factory('boardTileFactory', function() {
+app.factory('boardTileFactory', function () {
 
-  var BoardTile = function() {
+  var BoardTile = function () {
     this.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
     this.alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     this.vertical = false;
@@ -30,17 +30,17 @@ app.factory('boardTileFactory', function() {
     };
   };
 
-  BoardTile.prototype.setBoardMap = function(letter) {
+  BoardTile.prototype.setBoardMap = function (letter) {
     var index = letter.position.charAt(0);
     this.boardMap[index][letter.position] = letter;
   };
 
-  BoardTile.prototype.hasDirection = function() {
+  BoardTile.prototype.hasDirection = function () {
     if (this.vertical === true || this.horizontal === true) { return true; }
     return false;
   };
 
-  BoardTile.prototype.checkNextTile = function(tileToCheck, placedTile) {
+  BoardTile.prototype.checkNextTile = function (tileToCheck, placedTile) {
     var tileToCheckCoords = this.reverseConvert(tileToCheck);
     var placedTileCoords = this.reverseConvert(placedTile);
     if (this.vertical === true) {
@@ -52,7 +52,7 @@ app.factory('boardTileFactory', function() {
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
   };
 
-  BoardTile.prototype.mapRoadBlockDirections = function(placedTile) {
+  BoardTile.prototype.mapRoadBlockDirections = function (placedTile) {
     var placedTileCoords = {};
     placedTileCoords.latitude = placedTile.charAt(0);
     placedTileCoords.latitudeIndex = this.alphabet.indexOf(placedTileCoords.latitude);
@@ -66,7 +66,7 @@ app.factory('boardTileFactory', function() {
     }
   };
 
-  BoardTile.prototype.checkRoadBlock = function(placedTileCoords, direction) {
+  BoardTile.prototype.checkRoadBlock = function (placedTileCoords, direction) {
     var checkTileCoords = {};
 
     switch (direction) {
@@ -102,7 +102,7 @@ app.factory('boardTileFactory', function() {
     return false;
   };
 
-  BoardTile.prototype.resetDirection = function() {
+  BoardTile.prototype.resetDirection = function () {
     this.vertical = false;
     this.horizontal = false;
     this.boardRoad = {
@@ -113,7 +113,7 @@ app.factory('boardTileFactory', function() {
     };
   };
 
-  BoardTile.prototype.setTile = function(x, y, board) {
+  BoardTile.prototype.setTile = function (x, y, board) {
     var tile = board[this.convert(x, y)];
     if (tile === null) { return; }
     if (tile === undefined) { return 'empty'; }
@@ -121,25 +121,25 @@ app.factory('boardTileFactory', function() {
     return tile;
   };
 
-  BoardTile.prototype.convert = function(x, y) {
+  BoardTile.prototype.convert = function (x, y) {
     return this.letters[x] + String(y + 1);
   };
 
-  BoardTile.prototype.reverseConvert = function(tile) {
+  BoardTile.prototype.reverseConvert = function (tile) {
     var splitTile = _.initial(tile.split(/(\d+)/));
     splitTile[0] = _.indexOf(this.letters, splitTile[0]);
     splitTile[1] = parseInt(splitTile[1], 10) - 1;
     return splitTile;
   };
 
-  BoardTile.prototype.showStartingTile = function(x, y) {
+  BoardTile.prototype.showStartingTile = function (x, y) {
     if (x === 7 && y === 7) {
       return 'board-tiles-active';
     }
     return 'board-tiles-inactive';
   };
 
-  BoardTile.prototype.showBoardTiles = function(tileToCheck, playerInput) {
+  BoardTile.prototype.showBoardTiles = function (tileToCheck, playerInput) {
     if (this.hasDirection() === false) {
       this.determineDirection(playerInput);
     }
@@ -150,7 +150,7 @@ app.factory('boardTileFactory', function() {
     }
   };
 
-  BoardTile.prototype.determineDirection = function(playerInput) {
+  BoardTile.prototype.determineDirection = function (playerInput) {
     if (playerInput.length === 1) {
       return;
     }
@@ -163,7 +163,7 @@ app.factory('boardTileFactory', function() {
     }
   };
 
-  BoardTile.prototype.showLaidTiles = function(tileToCheck, playerInput, letterHistory) {
+  BoardTile.prototype.showLaidTiles = function (tileToCheck, playerInput, letterHistory) {
     var x = tileToCheck[0];
     var y = tileToCheck[1];
     for (var i in playerInput) {
@@ -174,15 +174,15 @@ app.factory('boardTileFactory', function() {
     }
   };
 
-  BoardTile.prototype.showWhenOneTileLaid = function(tileToCheck, playerInput) {
+  BoardTile.prototype.showWhenOneTileLaid = function (tileToCheck, playerInput) {
     var placedTile = this.reverseConvert(playerInput[0].position);
-    if (this.isOnAnySide(tileToCheck, placedTile) ) {
+    if (this.isOnAnySide(tileToCheck, placedTile)) {
       return 'board-tiles-active';
     }
     return 'board-tiles-inactive';
   };
 
-  BoardTile.prototype.showTilesLaidHorizontally = function(tileToCheck, playerInput) {
+  BoardTile.prototype.showTilesLaidHorizontally = function (tileToCheck, playerInput) {
     var placedTile = this.reverseConvert(playerInput[0].position);
     if (this.isEitherSide(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
     placedTile = this.reverseConvert(_.last(playerInput).position);
@@ -190,7 +190,7 @@ app.factory('boardTileFactory', function() {
     return 'board-tiles-inactive';
   };
 
-  BoardTile.prototype.showTilesLaidVertically = function(tileToCheck, playerInput) {
+  BoardTile.prototype.showTilesLaidVertically = function (tileToCheck, playerInput) {
     var placedTile = this.reverseConvert(playerInput[0].position);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
     placedTile = this.reverseConvert(_.last(playerInput).position);
@@ -198,23 +198,23 @@ app.factory('boardTileFactory', function() {
     return 'board-tiles-inactive';
   };
 
-  BoardTile.prototype.isOnAnySide = function(tileToCheck, placedTile) {
+  BoardTile.prototype.isOnAnySide = function (tileToCheck, placedTile) {
     return this.isSameTileColumn(tileToCheck, placedTile) || this.isSameTileRow(tileToCheck, placedTile);
   };
 
-  BoardTile.prototype.isEitherSide = function(tileToCheck, placedTile) {
+  BoardTile.prototype.isEitherSide = function (tileToCheck, placedTile) {
     return this.isSameTileRow(tileToCheck, placedTile);
   };
 
-  BoardTile.prototype.isAboveOrBelow = function(tileToCheck, placedTile) {
+  BoardTile.prototype.isAboveOrBelow = function (tileToCheck, placedTile) {
     return this.isSameTileColumn(tileToCheck, placedTile);
   };
 
-  BoardTile.prototype.isSameTileColumn = function(tileToCheck, placedTile) {
+  BoardTile.prototype.isSameTileColumn = function (tileToCheck, placedTile) {
     return placedTile[0] === tileToCheck[0];
   };
 
-  BoardTile.prototype.isSameTileRow = function(tileToCheck, placedTile) {
+  BoardTile.prototype.isSameTileRow = function (tileToCheck, placedTile) {
     return placedTile[1] === tileToCheck[1];
   };
 
