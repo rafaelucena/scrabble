@@ -52,18 +52,21 @@ app.factory('boardTileFactory', function () {
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
   };
 
-  BoardTile.prototype.mapRoadBlockDirections = function (placedTile) {
-    var placedTileCoords = {};
-    placedTileCoords.latitude = placedTile.charAt(0);
-    placedTileCoords.latitudeIndex = this.alphabet.indexOf(placedTileCoords.latitude);
-    placedTileCoords.longitude = placedTile.charAt(1);
-    placedTileCoords.address = placedTile;
-
+  BoardTile.prototype.mapRoadBlockDirections = function (placedTiles) {
     var directions = ['north', 'south', 'west', 'east'];
 
-    for (var i in directions) {
-      this.checkRoadBlock(placedTileCoords, directions[i]);
-    }
+    for (indexTile in placedTiles) {
+      var position = placedTiles[indexTile].position;
+      var coordinates = {};
+      coordinates.latitude = position.charAt(0);
+      coordinates.latitudeIndex = this.alphabet.indexOf(coordinates.latitude);
+      coordinates.longitude = position.charAt(1);
+      coordinates.address = position;
+
+      for (indexDirection = 0; indexDirection < directions.length; indexDirection++) {
+        this.checkRoadBlock(coordinates, directions[indexDirection]);
+      };
+    };
   };
 
   BoardTile.prototype.checkRoadBlock = function (placedTileCoords, direction) {
@@ -72,6 +75,9 @@ app.factory('boardTileFactory', function () {
     switch (direction) {
       case 'north':
       case 'south':
+        if (this.vertical === true) {
+          return false;
+        }
         if (direction === 'north') {
           checkTileCoords.latitudeIndex = Number(placedTileCoords.latitudeIndex) - 1;
         } else {
@@ -83,6 +89,9 @@ app.factory('boardTileFactory', function () {
         break;
       case 'west':
       case 'east':
+        if (this.horizontal === true) {
+          return false;
+        }
         checkTileCoords.latitudeIndex = placedTileCoords.latitudeIndex;
         checkTileCoords.latitude = placedTileCoords.latitude;
         if (direction === 'west') {
@@ -95,7 +104,7 @@ app.factory('boardTileFactory', function () {
     }
 
     if (checkTileCoords.length !== 0 && this.boardMap[checkTileCoords.latitude][checkTileCoords.address] !== undefined) {
-      this.boardRoad[direction][checkTileCoords.address] = this.boardMap[checkTileCoords.latitude][checkTileCoords.address];
+      this.boardRoad[direction].push(this.boardMap[checkTileCoords.latitude][checkTileCoords.address]);
       return true;
     }
 
@@ -210,11 +219,11 @@ app.factory('boardTileFactory', function () {
     return this.isSameTileColumn(tileToCheck, placedTile);
   };
 
-  BoardTile.prototype.isSameTileColumn = function (tileToCheck, placedTile) {
+  BoardTile.prototype.isSameTileRow = function (tileToCheck, placedTile) {
     return placedTile[0] === tileToCheck[0];
   };
 
-  BoardTile.prototype.isSameTileRow = function (tileToCheck, placedTile) {
+  BoardTile.prototype.isSameTileColumn = function (tileToCheck, placedTile) {
     return placedTile[1] === tileToCheck[1];
   };
 

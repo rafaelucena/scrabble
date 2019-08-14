@@ -138,7 +138,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     }
     self.addPlacedClass();
     self.addTile(tile);
-    self.checkForCompoundWord();
   };
 
   self.addTile = function (tile) {
@@ -149,10 +148,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.checkForCompoundWord = function () {
-    for (var i in self.submitted) {
-      var placedTile = self.submitted[i].position;
-      boardTileService.mapRoadBlockDirections(placedTile);
-    }
+    boardTileService.mapRoadBlockDirections(self.submitted);
   };
 
   self.tileAlreadyAdded = function (tileToCheck) {
@@ -203,6 +199,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   // Playing the word
 
   self.playWord = function () {
+    self.checkForCompoundWord();
     var word = _.pluck(self.submitted, 'letter').join('');
     var config = { params: { 'word': word } };
 
