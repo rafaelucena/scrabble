@@ -8,14 +8,6 @@ app.factory('wordsFactory', ['$http', function ($http) {
     });
   };
 
-  Words.prototype.organiseSubmission = function (letters) {
-    letters = _.chain(letters)
-      .sortBy('position')
-      .groupBy(function (letter) { return letter.position.length; })
-      .value();
-    return _.flatten([_.values(letters[2]), _.values(letters[3])]);
-  };
-
   Words.prototype.addSelectedClass = function (letters, index) {
     letters[index].status = 'selected';
     return letters;
