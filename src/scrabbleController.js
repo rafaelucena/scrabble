@@ -66,7 +66,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.disablePlayWord = function () {
-    if (self.input.length === 0) {
+    if (self.inputs.length === 0) {
       return true;
     }
     if (self.gameRules === true && self.wordHistory.length !== 0) {
@@ -114,7 +114,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   // Display board tiles at correct opacity
 
   self.showBoardTiles = function (x, y) {
-    if (self.wordHistory.length === 0 && self.input.length === 0 && self.gameRules === true) {
+    if (self.wordHistory.length === 0 && self.inputs.length === 0 && self.gameRules === true) {
       return boardTileService.showStartingTile(x, y);
     }
     var tileToCheck = [x, y];
@@ -194,7 +194,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     };
     self.boardDisplay[tile] = self.selected;
     self.submitted.push(userInput);
-    self.input.push(userInput);
     self.organiseSubmission();
     //@TODO - Find a way to delete input and submitted, keeping only inputs
     self.setInputs(userInput);
@@ -246,7 +245,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.updateLetterHistory = function () {
-    _.each(self.input, function (letter) {
+    _.each(self.inputs.list, function (letter) {
       boardTileService.setBoardMap(letter);
       self.letterHistory.push(letter);
     });
@@ -267,8 +266,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.removeTileFromDisplay = function () {
-    _.each(_.pluck(self.input, 'position'), function (position) {
-      self.boardDisplay[position] = self.bonuses[position];
+    _.each(self.inputs.list, function (letter) {
+      self.boardDisplay[letter.position] = self.bonuses[letter.position];
     });
     boardTileService.resetDirection();
   };
@@ -280,7 +279,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.resetInput = function () {
-    self.input = [];
     self.submitted = [];
     //@TODO - Find a way to delete input and submitted, keeping only inputs
     self.resetInputs();
