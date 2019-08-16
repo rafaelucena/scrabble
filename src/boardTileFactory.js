@@ -163,8 +163,8 @@ app.factory('boardTileFactory', function () {
     if (playerInput.length === 1) {
       return;
     }
-    var placedTile = this.reverseConvert(playerInput[0].position);
-    var tileToCheck = this.reverseConvert(playerInput[1].position);
+    var placedTile = this.reverseConvert(playerInput.reference);
+    var tileToCheck = this.reverseConvert(playerInput.last);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) {
       this.vertical = true;
     } else if (this.isEitherSide(tileToCheck, placedTile) === true) {
@@ -184,7 +184,7 @@ app.factory('boardTileFactory', function () {
   };
 
   BoardTile.prototype.showWhenOneTileLaid = function (tileToCheck, playerInput) {
-    var placedTile = this.reverseConvert(playerInput[0].position);
+    var placedTile = this.reverseConvert(playerInput.reference);
     if (this.isOnAnySide(tileToCheck, placedTile)) {
       return 'board-tiles-active';
     }
@@ -192,17 +192,17 @@ app.factory('boardTileFactory', function () {
   };
 
   BoardTile.prototype.showTilesLaidHorizontally = function (tileToCheck, playerInput) {
-    var placedTile = this.reverseConvert(playerInput[0].position);
+    var placedTile = this.reverseConvert(playerInput.reference);
     if (this.isEitherSide(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
-    placedTile = this.reverseConvert(_.last(playerInput).position);
+    placedTile = this.reverseConvert(playerInput.last);
     if (this.isEitherSide(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
     return 'board-tiles-inactive';
   };
 
   BoardTile.prototype.showTilesLaidVertically = function (tileToCheck, playerInput) {
-    var placedTile = this.reverseConvert(playerInput[0].position);
+    var placedTile = this.reverseConvert(playerInput.reference);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
-    placedTile = this.reverseConvert(_.last(playerInput).position);
+    placedTile = this.reverseConvert(playerInput.last);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) { return 'board-tiles-active'; }
     return 'board-tiles-inactive';
   };

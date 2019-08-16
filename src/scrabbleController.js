@@ -35,7 +35,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.resetInputs = function () {
     self.inputs = {
       'direction': '',
-      'position': '',
+      'reference': '',
+      'last': '',
       'length': 0,
       'list': {},
     };
@@ -45,6 +46,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     if (self.inputs.reference === '') {
       self.inputs.reference = letter.position;
     }
+    self.inputs.last = letter.position;
     self.inputs.length = self.inputs.length + 1;
     self.inputs.list[letter.position] = letter;
   };
@@ -118,14 +120,14 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
       return boardTileService.showStartingTile(x, y);
     }
     var tileToCheck = [x, y];
-    if (boardTileService.showLaidTiles(tileToCheck, self.submitted, self.letterHistory) === true) {
+    if (boardTileService.showLaidTiles(tileToCheck, self.inputs.list, self.letterHistory) === true) {
       return 'board-tiles-active';
     }
-    if (self.submitted.length === 0) { return 'board-tiles-active'; }
-    if (self.submitted.length === 1) {
-      return boardTileService.showWhenOneTileLaid(tileToCheck, self.submitted);
+    if (self.inputs.length === 0) { return 'board-tiles-active'; }
+    if (self.inputs.length === 1) {
+      return boardTileService.showWhenOneTileLaid(tileToCheck, self.inputs);
     }
-    return boardTileService.showBoardTiles(tileToCheck, self.submitted);
+    return boardTileService.showBoardTiles(tileToCheck, self.inputs);
   };
 
   self.disabledTile = function (x, y) {
