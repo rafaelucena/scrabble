@@ -168,11 +168,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.checkForCompoundWord = function () {
-    boardTileService.mapRoadBlockDirections(self.submitted);
-  };
-
-  self.tileAlreadyAdded = function (tileToCheck) {
-    return _.contains(_.pluck(self.submitted, 'position'), tileToCheck);
+    boardTileService.mapRoadBlockDirections(self.inputs);
   };
 
   self.assignLetterToBlank = function (tile) {
@@ -195,9 +191,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
       'blank': isBlank
     };
     self.boardDisplay[tile] = self.selected;
-    self.submitted.push(userInput);
-    self.organiseSubmission();
-    //@TODO - Find a way to delete input and submitted, keeping only inputs
     self.setInputs(userInput);
     self.selected = null;
   };
@@ -208,10 +201,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     if (self.boardDisplay[tile].length === 1) { return false; }
   };
 
-  self.organiseSubmission = function () {
-    self.submitted = wordService.organiseSubmission(self.submitted);
-  };
-
   self.swapLetter = function () {
     self.player1Letters = gameService.swapLetter(self.player1Letters, self.bag);
     self.selected = null;
@@ -220,8 +209,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   // Playing the word
 
   self.playWord = function () {
-    self.checkForCompoundWord();
-    var word = _.pluck(self.submitted, 'letter').join('');
+    // self.checkForCompoundWord();
+    var word = _.pluck(self.inputs.list, 'letter').join('');
     var config = { params: { 'word': word } };
 
     $http.get('/word', config).then(function (response) {
@@ -254,7 +243,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.getPoints = function (word, definition) {
-    var points = gameService.getPoints(self.submitted);
+    var points = gameService.getPoints(self.inputs);
     self.wordHistory.push({ 'word': word, 'points': points, 'definition': definition });
     self.totalScore += points;
   };
@@ -277,12 +266,10 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.clear = function () {
     self.removeTileFromDisplay();
     self.removeAllPlacedClasses();
-    self.resetInput();
+    self.resetInputs();
   };
 
   self.resetInput = function () {
-    self.submitted = [];
-    //@TODO - Find a way to delete input and submitted, keeping only inputs
     self.resetInputs();
   };
 }]);

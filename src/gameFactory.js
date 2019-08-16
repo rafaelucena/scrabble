@@ -57,11 +57,11 @@ app.factory('gameFactory', function () {
   Game.prototype.getPoints = function (input) {
     var currentBonuses = { 'word': 1 };
     var total = 0;
-    for (var i in input) {
+    for (var i in input.list) {
       currentBonuses.letter = 1;
-      var position = input[i].position;
+      var position = input.list[i].position;
       currentBonuses = this.getBonuses(position, currentBonuses);
-      var letter = this.checkForBlankOrLetter(input[i]);
+      var letter = this.checkForBlankOrLetter(input.list[i]);
       total += (letterValues[letter].points * currentBonuses.letter);
       delete this.bonuses[position];
     }
