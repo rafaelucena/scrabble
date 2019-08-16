@@ -8,6 +8,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.wordHistory = [];
   self.selected = null;
   self.totalScore = 0;
+  self.inputs = {};
 
   var boardTileService = new boardTileFactory();
   var gameService = new gameFactory();
@@ -29,6 +30,23 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.gameRulesButton = function () {
     if (self.gameRules === true) { return 'On'; }
     return 'Off';
+  };
+
+  self.resetInputs = function () {
+    self.inputs = {
+      'direction': '',
+      'position': '',
+      'length': 0,
+      'list': {},
+    };
+  };
+
+  self.setInputs = function (letter) {
+    if (self.inputs.reference === '') {
+      self.inputs.reference = letter.position;
+    }
+    self.inputs.length = self.inputs.length + 1;
+    self.inputs.list[letter.position] = letter;
   };
 
   self.setup = function () {
@@ -178,6 +196,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.submitted.push(userInput);
     self.input.push(userInput);
     self.organiseSubmission();
+    //@TODO - Find a way to delete input and submitted, keeping only inputs
+    self.setInputs(userInput);
     self.selected = null;
   };
 
@@ -262,5 +282,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.resetInput = function () {
     self.input = [];
     self.submitted = [];
+    //@TODO - Find a way to delete input and submitted, keeping only inputs
+    self.resetInputs();
   };
 }]);
