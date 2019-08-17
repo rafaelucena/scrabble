@@ -167,8 +167,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.addToInput(tile, false);
   };
 
-  self.checkForCompoundWord = function () {
-    boardTileService.mapRoadBlockDirections(self.inputs);
+  self.getFormedWords = function () {
+    self.inputs = boardTileService.mapIntercepts(self.inputs);
   };
 
   self.assignLetterToBlank = function (tile) {
@@ -210,7 +210,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   // Playing the word
 
   self.playWord = function () {
-    //self.checkForCompoundWord();
+    self.getFormedWords();
     var word = _.pluck(self.inputs.list, 'letter').join('');
     var config = { params: { 'word': word } };
 

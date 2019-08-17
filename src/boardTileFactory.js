@@ -24,7 +24,7 @@ app.factory('boardTileFactory', function () {
   };
 
   BoardTile.prototype.setBoardMap = function (letter) {
-    var index = letter.position.charAt(0);
+    var index = letter.position.substring(0, 1);
     this.boardMap[index][letter.position] = letter;
   };
 
@@ -44,6 +44,76 @@ app.factory('boardTileFactory', function () {
       return this.isEitherSide(tileToCheckCoords, placedTileCoords);
     }
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
+  };
+
+  BoardTile.prototype.mapIntercepts = function (playerInputs) {
+    playerInputs.direction = this.direction;
+
+    for (var index in playerInputs.list) {
+      var playerInput = this.checkBorders(playerInputs.list[index]);
+
+      if (playerInput.intercept === 'cross') {
+        playerInputs.direction = 'horizontal';
+        playerInput.intercept = 'vertical';
+      }
+    };
+
+    return playerInputs;
+  };
+
+  BoardTile.prototype.isOnBoard = function (position) {
+    return this.boardMap[position.substring(0, 1)][position] !== undefined;
+  };
+
+  BoardTile.prototype.checkBorderVertical = function (position) {
+    var latitude = position.substring(0, 1);
+    var longitude = position.substring(1);
+    var index = this.alphabet.indexOf(latitude);
+
+    var previous = this.alphabet.charAt(index - 1) + longitude;
+    var next = this.alphabet.charAt(index + 1) + longitude;
+
+    if (this.isOnBoard(previous) || this.isOnBoard(next)) {
+      return true;
+    }
+    return false;
+  };
+
+  BoardTile.prototype.checkBorderHorizontal = function (position) {
+    var latitude = position.substring(0, 1);
+    var longitude = position.substring(1);
+
+    var previous = latitude + (Number(longitude) - 1);
+    var next = latitude + (Number(longitude) + 1);
+
+    if (this.isOnBoard(previous) || this.isOnBoard(next)) {
+      return true;
+    }
+    return false;
+  };
+
+  BoardTile.prototype.checkBorders = function (playerInput) {
+    var intercept = [];
+
+    if (this.direction === 'horizontal' || this.direction === '') {
+      if (this.checkBorderVertical(playerInput.position)) {
+        intercept.push('vertical');
+      }
+    }
+
+    if (this.direction === 'vertical' || this.direction === '') {
+      if (this.checkBorderHorizontal(playerInput.position)) {
+        intercept.push('horizontal');
+      }
+    }
+
+    if (intercept.length === 2) {
+      playerInput.intercept = 'cross';
+    } else if (intercept.length === 1) {
+      playerInput.intercept = intercept[0];
+    }
+
+    return playerInput;
   };
 
   BoardTile.prototype.resetDirection = function () {
