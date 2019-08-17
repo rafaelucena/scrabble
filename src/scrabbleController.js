@@ -188,7 +188,8 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     let userInput = {
       'letter': self.selected,
       'position': tile,
-      'blank': isBlank
+      'blank': isBlank,
+      'intercept': '',
     };
     self.boardDisplay[tile] = self.selected;
     self.setInputs(userInput);
@@ -209,7 +210,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   // Playing the word
 
   self.playWord = function () {
-    // self.checkForCompoundWord();
+    //self.checkForCompoundWord();
     var word = _.pluck(self.inputs.list, 'letter').join('');
     var config = { params: { 'word': word } };
 
