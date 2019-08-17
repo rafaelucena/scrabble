@@ -3,8 +3,7 @@ app.factory('boardTileFactory', function () {
   var BoardTile = function () {
     this.letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M', 'N', 'O', 'P', 'Q'];
     this.alphabet = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    this.vertical = false;
-    this.horizontal = false;
+    this.direction = '';
     this.boardMap = {
       "A": {},
       "B": {},
@@ -30,25 +29,25 @@ app.factory('boardTileFactory', function () {
   };
 
   BoardTile.prototype.hasDirection = function () {
-    if (this.vertical === true || this.horizontal === true) { return true; }
+    if (this.direction !== '') {
+      return true;
+    }
     return false;
   };
 
   BoardTile.prototype.checkNextTile = function (tileToCheck, placedTile) {
     var tileToCheckCoords = this.reverseConvert(tileToCheck);
     var placedTileCoords = this.reverseConvert(placedTile);
-    if (this.vertical === true) {
+    if (this.direction === 'vertical') {
       return this.isAboveOrBelow(tileToCheckCoords, placedTileCoords);
-    }
-    else if (this.horizontal === true) {
+    } else if (this.direction === 'horizontal') {
       return this.isEitherSide(tileToCheckCoords, placedTileCoords);
     }
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
   };
 
   BoardTile.prototype.resetDirection = function () {
-    this.vertical = false;
-    this.horizontal = false;
+    this.direction = '';
   };
 
   BoardTile.prototype.setTile = function (x, y, board) {
@@ -81,9 +80,9 @@ app.factory('boardTileFactory', function () {
     if (this.hasDirection() === false) {
       this.determineDirection(playerInput);
     }
-    if (this.vertical === true) {
+    if (this.direction === 'vertical') {
       return this.showTilesLaidVertically(tileToCheck, playerInput);
-    } else if (this.horizontal === true) {
+    } else if (this.direction === 'horizontal') {
       return this.showTilesLaidHorizontally(tileToCheck, playerInput);
     }
   };
@@ -95,9 +94,9 @@ app.factory('boardTileFactory', function () {
     var placedTile = this.reverseConvert(playerInput.reference);
     var tileToCheck = this.reverseConvert(playerInput.last);
     if (this.isAboveOrBelow(tileToCheck, placedTile) === true) {
-      this.vertical = true;
+      this.direction = 'vertical';
     } else if (this.isEitherSide(tileToCheck, placedTile) === true) {
-      this.horizontal = true;
+      this.direction = 'horizontal';
     }
   };
 
