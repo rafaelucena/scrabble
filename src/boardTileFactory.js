@@ -46,6 +46,80 @@ app.factory('boardTileFactory', function () {
     return this.isOnAnySide(tileToCheckCoords, placedTileCoords);
   };
 
+  BoardTile.prototype.mapFormedWords = function (playerInputs) {
+    playerInputs = this.mapIntercepts(playerInputs);
+
+    var words = {
+      'valid': false,
+      'inputs': {},
+      'list': [],
+    };
+    words.list.push(this.getFormedWordDirection(playerInputs, this.direction));
+    words.valid = words.list[0].valid;
+
+    for (var a in playerInputs.list) {
+      words.inputs[a] = playerInputs.list[a];
+
+      if (playerInputs.list[a].intercept !== '') {
+        var intercepted = {
+          'direction': playerInputs.list[a].intercept,
+          'reference': playerInputs.list[a].position,
+          'list': {},
+        };
+        intercepted.list[a] = {
+          'letter': playerInputs.list[a].letter,
+        };
+
+        var formedWord = this.getFormedWordDirection(intercepted, intercepted.direction);
+        words.list.push(formedWord);
+        words.valid = words.valid && formedWord.valid;
+      }
+    }
+
+    return words;
+  }
+
+  BoardTile.prototype.getFormedWordDirection = function (inputs, direction) {
+    var baseWordKeys = Object.keys(inputs.list);
+    var playerTiles = [];
+
+    var word = {
+      'formed': '',
+      'valid': false,
+      'direction': direction,
+      'tiles': {},
+    };
+
+    for (var a = 1; a <= 15; a++) {
+      if (direction === 'horizontal') {
+        address = inputs.reference.substring(0, 1) + a;
+      } else {
+        address = this.alphabet.charAt(a) + inputs.reference.substring(1);
+      }
+
+      if (this.isOnBoard(address)) {
+        word.tiles[address] = this.getFromBoard(address);
+        word.formed = word.formed + word.tiles[address].letter;
+      } else if (inputs.list[address] !== undefined) {
+        word.tiles[address] = inputs.list[address];
+        word.formed = word.formed + word.tiles[address].letter;
+        playerTiles.push(address);
+      } else if (word.formed.length >= 2 && playerTiles.length === baseWordKeys.length) {
+        word.valid = true;
+        break;
+      } else {
+        word = {
+          'formed': '',
+          'valid': false,
+          'direction': direction,
+          'tiles': {},
+        };
+      }
+    }
+
+    return word;
+  };
+
   BoardTile.prototype.mapIntercepts = function (playerInputs) {
     playerInputs.direction = this.direction;
 
@@ -64,6 +138,10 @@ app.factory('boardTileFactory', function () {
   BoardTile.prototype.isOnBoard = function (position) {
     return this.boardMap[position.substring(0, 1)][position] !== undefined;
   };
+
+  BoardTile.prototype.getFromBoard = function (position) {
+    return this.boardMap[position.charAt(0)][position];
+  }
 
   BoardTile.prototype.checkBorderVertical = function (position) {
     var latitude = position.substring(0, 1);

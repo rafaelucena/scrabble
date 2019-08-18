@@ -9,6 +9,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   self.selected = null;
   self.totalScore = 0;
   self.inputs = {};
+  self.words = {};
 
   var boardTileService = new boardTileFactory();
   var gameService = new gameFactory();
@@ -168,7 +169,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.getFormedWords = function () {
-    self.inputs = boardTileService.mapIntercepts(self.inputs);
+    self.words = boardTileService.getFormedWords(self.inputs);
   };
 
   self.assignLetterToBlank = function (tile) {
