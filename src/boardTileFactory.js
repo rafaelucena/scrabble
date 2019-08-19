@@ -51,15 +51,12 @@ app.factory('boardTileFactory', function () {
 
     var words = {
       'valid': false,
-      'inputs': {},
       'list': [],
     };
     words.list.push(this.getFormedWordDirection(playerInputs, this.direction));
     words.valid = words.list[0].valid;
 
     for (var a in playerInputs.list) {
-      words.inputs[a] = playerInputs.list[a];
-
       if (playerInputs.list[a].intercept !== '') {
         var intercepted = {
           'direction': playerInputs.list[a].intercept,

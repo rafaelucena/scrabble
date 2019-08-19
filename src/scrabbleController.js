@@ -169,7 +169,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.getFormedWords = function () {
-    self.words = boardTileService.getFormedWords(self.inputs);
+    self.words = boardTileService.mapFormedWords(self.inputs);
   };
 
   self.assignLetterToBlank = function (tile) {
@@ -212,15 +212,26 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
 
   self.playWord = function () {
     self.getFormedWords();
-    var word = _.pluck(self.inputs.list, 'letter').join('');
-    var config = { params: { 'word': word } };
 
-    $http.get('/word', config).then(function (response) {
-      if (response.data.length === 0) {
-        return self.notAWord(word);
-      }
-      return self.isAWord(word, response.data.description);
-    });
+    if (self.words.valid === false) {
+      return self.notAWord('');
+    }
+
+    for (var x in self.words.list) {
+      var config = { params: { 'word': self.words.list[x].formed } };
+      $http.get('/word', config).then(function (response) {
+        if (response.data.length === 0) {
+          self.words.list[x].valid = false;
+          self.words.valid = false
+        }
+      });
+    }
+
+    if (self.words.valid === false) {
+      return self.notAWord('');
+    }
+
+    return self.validWords(self.words);
   };
 
   self.notAWord = function (word) {
@@ -228,14 +239,14 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.resetRound();
   };
 
-  self.isAWord = function (word, definition) {
-    self.getPoints(word, definition);
+  self.validWords = function (words) {
+    self.getPoints(words);
     self.player1Letters = wordService.removePlacedLetters(self.player1Letters);
     self.distributeNewLetters();
     self.updateLetterHistory();
     self.resetInput();
     boardTileService.resetDirection();
-  };
+  }
 
   self.updateLetterHistory = function () {
     _.each(self.inputs.list, function (letter) {
@@ -244,10 +255,12 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     });
   };
 
-  self.getPoints = function (word, definition) {
-    var points = gameService.getPoints(self.inputs);
-    self.wordHistory.push({ 'word': word, 'points': points, 'definition': definition });
-    self.totalScore += points;
+  self.getPoints = function (words) {
+    for (var x in words.list) {
+      var points = gameService.getPoints(self.inputs);
+      self.wordHistory.push({ 'word': word, 'points': points, 'definition': definition });
+      self.totalScore += points;
+    }
   };
 
   // Clearing
