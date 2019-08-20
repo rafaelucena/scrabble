@@ -287,5 +287,6 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
 
   self.resetInput = function () {
     self.resetInputs();
+    self.words = {};
   };
 }]);

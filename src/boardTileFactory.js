@@ -128,8 +128,15 @@ app.factory('boardTileFactory', function () {
       var playerInput = this.checkBorders(playerInputs.list[index]);
 
       if (playerInput.intercept === 'cross') {
+        this.direction = 'horizontal';
         playerInputs.direction = 'horizontal';
         playerInput.intercept = 'vertical';
+      }
+
+      if (playerInput.intercept !== '' && this.direction === '') {
+        this.direction = playerInput.intercept;
+        playerInputs.direction = this.direction;
+        playerInput.intercept = '';
       }
     };
 
