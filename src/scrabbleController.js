@@ -260,7 +260,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
 
     for (var x in words.list) {
       self.wordHistory.push({ 'word': words.list[x].formed, 'points': words.list[x].points, 'definition': '' });
-      self.totalScore += points;
+      self.totalScore += words.list[x].points;
     }
   };
 
