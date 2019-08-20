@@ -240,7 +240,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.validWords = function (words) {
-    self.getPoints(words.list);
+    self.getPoints(words);
     self.player1Letters = wordService.removePlacedLetters(self.player1Letters);
     self.distributeNewLetters();
     self.updateLetterHistory();
@@ -256,9 +256,10 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.getPoints = function (words) {
+    words.list = gameService.getPoints(words.list);
+
     for (var x in words.list) {
-      var points = gameService.getPoints(self.inputs);
-      self.wordHistory.push({ 'word': word, 'points': points, 'definition': definition });
+      self.wordHistory.push({ 'word': words.list[x].formed, 'points': words.list[x].points, 'definition': '' });
       self.totalScore += points;
     }
   };
