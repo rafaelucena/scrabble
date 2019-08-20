@@ -5,6 +5,7 @@ app.factory('boardTileFactory', function () {
     this.alphabet = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     this.direction = '';
     this.boardMap = {
+      "_": {},
       "A": {},
       "B": {},
       "C": {},
