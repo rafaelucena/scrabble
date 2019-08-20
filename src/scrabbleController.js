@@ -240,7 +240,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
   };
 
   self.validWords = function (words) {
-    self.getPoints(words);
+    self.getPoints(words.list);
     self.player1Letters = wordService.removePlacedLetters(self.player1Letters);
     self.distributeNewLetters();
     self.updateLetterHistory();

@@ -54,24 +54,36 @@ app.factory('gameFactory', function () {
     return currentLetters;
   };
 
-  Game.prototype.getPoints = function (input) {
-    var currentBonuses = { 'word': 1 };
-    var total = 0;
-    for (var i in input.list) {
-      currentBonuses.letter = 1;
-      var position = input.list[i].position;
-      currentBonuses = this.getBonuses(position, currentBonuses);
-      var letter = this.checkForBlankOrLetter(input.list[i]);
-      total += (letterValues[letter].points * currentBonuses.letter);
-      delete this.bonuses[position];
+  Game.prototype.getPoints = function (words) {
+    var unsetList = [];
+
+    for (var x in words) {
+      var currentBonuses = {
+        'word': 1
+      };
+      var points = 0;
+
+      for (var i in words[x].tiles) {
+        currentBonuses.letter = 1;
+        var position = words[x].tiles[i].position;
+        currentBonuses = this.getBonuses(position, currentBonuses);
+        var letter = this.checkForBlankOrLetter(words[x].tiles[i]);
+        points += (letterValues[letter].points * currentBonuses.letter);
+        unsetList.push(position);
+      }
+
+      points *= currentBonuses.word;
+      points = this.bingoBonus(words[x], points);
+      words[x].points = points;
     }
-    total *= currentBonuses.word;
-    total = this.bingoBonus(input, total);
-    return total;
+
+    this.unsetBonuses(unsetList);
+
+    return words;
   };
 
   Game.prototype.getBonuses = function (position, currentBonuses) {
-    if (_.has(this.bonuses, position) === true) {
+    if (this.bonuses[position] !== undefined) {
       position = this.bonuses[position];
       if (position === 'doubleword') { currentBonuses.word *= 2; }
       if (position === 'tripleword') { currentBonuses.word *= 3; }
@@ -82,13 +94,23 @@ app.factory('gameFactory', function () {
   };
 
   Game.prototype.checkForBlankOrLetter = function (tile) {
-    if (tile.blank === true) { return 'blank'; }
+    if (tile.blank === true) {
+      return 'blank';
+    }
     return tile.letter;
   };
 
   Game.prototype.bingoBonus = function (input, total) {
-    if (input.length === 7) { total += 50; }
+    if (input.length === 7) {
+      total += 50;
+    }
     return total;
+  };
+
+  Game.prototype.unsetBonuses = function (unsetList) {
+    for (var x in unsetList) {
+      delete this.bonuses[unsetList[x]];
+    }
   };
 
   return Game;
