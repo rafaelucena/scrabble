@@ -3,11 +3,11 @@ var request = require('request');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.render('index');
 });
 
-router.get('/config', function(req, res, next) {
+router.get('/config', function (req, res, next) {
   return res.json({ env: process.env.NODE_ENV });
 });
 
@@ -23,15 +23,15 @@ router.get('/config', function(req, res, next) {
 //   });
 // });
 
-router.get('/word', function(req, res, next) {
+router.get('/word', function (req, res, next) {
   var url = 'http://localhost:8080/api/words/';
   var wordDef = req.query.word + '/check';
   var wordRequest = url + wordDef;
-  request(wordRequest, function(error, response, body) {
+  request(wordRequest, function (error, response, body) {
     if (!error && response.statusCode === 200) {
       res.json(JSON.parse(response.body));
     } else {
-      res.json([]);
+      res.json({ 'length': 0, 'word': req.query.word });
     }
   });
 });

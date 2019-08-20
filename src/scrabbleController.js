@@ -1,4 +1,4 @@
-app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'boardTileFactory', 'ngDialog', function ($http, wordsFactory, gameFactory, boardTileFactory, ngDialog) {
+app.controller('ScrabbleController', ['$http', '$q', 'wordsFactory', 'gameFactory', 'boardTileFactory', 'ngDialog', function ($http, $q, wordsFactory, gameFactory, boardTileFactory, ngDialog) {
 
   var self = this;
 
@@ -217,21 +217,20 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
       return self.notAWord('');
     }
 
+    var requests = [];
     for (var x in self.words.list) {
       var config = { params: { 'word': self.words.list[x].formed } };
-      $http.get('/word', config).then(function (response) {
-        if (response.data.length === 0) {
-          self.words.list[x].valid = false;
-          self.words.valid = false
+      requests.push($http.get('/word', config));
+    }
+
+    $q.all(requests).then(function (response) {
+      for (var x = 0; x < response.length; x++) {
+        if (response[x].data.length === 0) {
+          self.notAWord(response[x].data.word);
         }
-      });
-    }
-
-    if (self.words.valid === false) {
-      return self.notAWord('');
-    }
-
-    return self.validWords(self.words);
+      }
+      self.validWords(self.words);
+    });
   };
 
   self.notAWord = function (word) {
