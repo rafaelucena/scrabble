@@ -246,7 +246,7 @@ app.controller('ScrabbleController', ['$http', 'wordsFactory', 'gameFactory', 'b
     self.updateLetterHistory();
     self.resetInput();
     boardTileService.resetDirection();
-  }
+  };
 
   self.updateLetterHistory = function () {
     _.each(self.inputs.list, function (letter) {
