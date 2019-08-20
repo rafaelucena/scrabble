@@ -82,12 +82,14 @@ app.factory('boardTileFactory', function () {
 
     var word = {
       'formed': '',
+      'length': 0,
       'valid': false,
       'direction': direction,
       'tiles': {},
     };
 
     for (var a = 1; a <= 15; a++) {
+      var address = '';
       if (direction === 'horizontal') {
         address = inputs.reference.substring(0, 1) + a;
       } else {
@@ -98,6 +100,7 @@ app.factory('boardTileFactory', function () {
         word.tiles[address] = this.getFromBoard(address);
         word.formed = word.formed + word.tiles[address].letter;
       } else if (inputs.list[address] !== undefined) {
+        word.length++;
         word.tiles[address] = inputs.list[address];
         word.formed = word.formed + word.tiles[address].letter;
         playerTiles.push(address);
@@ -107,6 +110,7 @@ app.factory('boardTileFactory', function () {
       } else {
         word = {
           'formed': '',
+          'length': 0,
           'valid': false,
           'direction': direction,
           'tiles': {},
