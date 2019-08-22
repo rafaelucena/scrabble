@@ -20,7 +20,8 @@
     "express": "~4.12.4",
     "express-session": "^1.11.3",
     "morgan": "~1.5.3",
-    "request": "^2.64.0"
+    "request": "^2.64.0",
+    "socket.io": "^2.2.0"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
