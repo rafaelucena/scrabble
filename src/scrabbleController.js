@@ -138,9 +138,14 @@ app.controller('ScrabbleController', ['$http', '$q', 'wordsFactory', 'gameFactor
   // Placing tiles on the board
 
   self.selectLetter = function (index) {
-    if (self.player1Letters[index].status === 'placed') { return; }
+    if (self.player1Letters[index].status === 'placed') {
+      return;
+    }
     if (self.player1Letters[index].status === 'selected') {
       return self.undoSelect(index);
+    }
+    if (self.selected !== null && self.player1Letters[index].status === 'ready') {
+      return self.adjustLetters(index);
     }
     self.selected = self.player1Letters[index].value;
     self.removeAllSelectedClass();
@@ -148,6 +153,23 @@ app.controller('ScrabbleController', ['$http', '$q', 'wordsFactory', 'gameFactor
   };
 
   self.undoSelect = function (index) {
+    self.selected = null;
+    self.removeAllSelectedClass();
+  };
+
+  self.adjustLetters = function (index) {
+    var indexOfSelected = null;
+
+    for (var x in self.player1Letters) {
+      if (self.player1Letters[x].status === 'selected') {
+        indexOfSelected = x;
+        break;
+      }
+    }
+
+    var valueOfReady = self.player1Letters[index].value;
+    self.player1Letters[index].value = self.selected;
+    self.player1Letters[indexOfSelected].value = valueOfReady;
     self.selected = null;
     self.removeAllSelectedClass();
   };
